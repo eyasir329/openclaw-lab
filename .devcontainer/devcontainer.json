@@ -1,0 +1,22 @@
+{
+  "name": "OpenClaw Lab",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "forwardPorts": [3000, 8080, 8787],
+
+  "postCreateCommand": "npm install -g pnpm openclaw@latest",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}
