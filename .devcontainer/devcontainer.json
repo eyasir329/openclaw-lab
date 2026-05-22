@@ -8,6 +8,12 @@
 
   "forwardPorts": [3000, 8080, 8787],
 
+  "portsAttributes": {
+    "3000": { "label": "Dev server", "onAutoForward": "notify" },
+    "8080": { "label": "HTTP server", "onAutoForward": "notify" },
+    "8787": { "label": "OpenClaw Gateway", "onAutoForward": "notify" }
+  },
+
   "postCreateCommand": "npm install -g pnpm openclaw@latest",
 
   "customizations": {
