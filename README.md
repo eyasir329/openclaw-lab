@@ -1,2 +1,2 @@
-# -openclaw-lab
-Building autonomous AI workflows, cloud agents, and intelligent automation using OpenClaw.
+# openclaw-lab
+Experimental OpenClaw lab for AI agents, automation, cloud deployment, and autonomous workflows.
