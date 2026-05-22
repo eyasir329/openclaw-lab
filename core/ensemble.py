@@ -15,13 +15,13 @@ from __future__ import annotations
 import asyncio
 import json
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import aiohttp
 
 from .nim_client import NIMResult, call_nim, strip_fences, try_parse_json
-
 
 # ── Default ensemble roster ───────────────────────────────────────────────────
 #
@@ -386,12 +386,12 @@ __all__ = [
     "DEFAULT_ENSEMBLE",
     "DEFAULT_FUSION_MODEL",
     "DEFAULT_FUSION_TIMEOUT",
-    "ScorerOutput",
     "EnsembleResult",
-    "run_scorer_fanout",
+    "ScorerOutput",
     "fuse_with_kimi",
-    "weighted_average_fusion",
     "run_ensemble",
+    "run_scorer_fanout",
     "strip_fences",
     "try_parse_json",
+    "weighted_average_fusion",
 ]

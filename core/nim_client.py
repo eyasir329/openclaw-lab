@@ -11,7 +11,6 @@ Design goals:
 
 from __future__ import annotations
 
-import asyncio
 import json
 import re
 import time
@@ -21,7 +20,6 @@ from typing import Any
 import aiohttp
 
 from .config import NIM_ENDPOINT
-
 
 # ── Result type ───────────────────────────────────────────────────────────────
 
@@ -140,7 +138,7 @@ async def call_nim(
                     http_status=status,
                 )
             data = await resp.json()
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return NIMResult(
             ok=False,
             model=model,

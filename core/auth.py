@@ -32,7 +32,7 @@ class TelegramAuthError(PermissionError):
 def _resolve_allowlist() -> frozenset[int]:
     try:
         return cached_runtime_config().allowed_user_ids
-    except EnvironmentError:
+    except OSError:
         return frozenset()
 
 
@@ -79,7 +79,7 @@ def format_denial(user_id: int | str | None = None) -> str:
 __all__ = [
     "TelegramAuthError",
     "allowlist_is_empty",
-    "is_allowed",
     "ensure_allowed",
     "format_denial",
+    "is_allowed",
 ]

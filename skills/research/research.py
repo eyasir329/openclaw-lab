@@ -29,16 +29,15 @@ if str(_REPO_ROOT) not in sys.path:
 
 # Reuse search.py's backend gather + intent helpers
 sys.path.insert(0, str(_REPO_ROOT / "skills"))
-from search.search import gather_results, parse_args  # noqa: E402
+from search.search import gather_results, parse_args
 
-from core.config import load_runtime_config  # noqa: E402
-from core.ensemble import (  # noqa: E402
+from core.config import load_runtime_config
+from core.ensemble import (
     DEFAULT_ENSEMBLE,
     EnsembleResult,
     run_ensemble,
 )
-from core.logging import audit_log  # noqa: E402
-
+from core.logging import audit_log
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PROMPTS
@@ -198,7 +197,7 @@ def _print_human(query: str, fused: dict | None, ensemble: EnsembleResult, sourc
         for i, kf in enumerate(findings, 1):
             claim = kf.get("claim", "").strip()
             support = kf.get("support_count") or len(kf.get("supporting_indices", []) or [])
-            print(f"{i}. ({support}× supported) {claim}")
+            print(f"{i}. ({support}x supported) {claim}")
 
     conflicts = fused.get("conflicting_claims") or []
     if conflicts:
@@ -230,8 +229,8 @@ def _print_human(query: str, fused: dict | None, ensemble: EnsembleResult, sourc
     limits = fused.get("limitations") or []
     if limits:
         print("\nLIMITATIONS\n───────────")
-        for l in limits:
-            print(f"• {l}")
+        for item in limits:
+            print(f"• {item}")
 
     print()
 

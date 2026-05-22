@@ -23,7 +23,6 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 OPENCLAW_CONFIG_PATH = Path.home() / ".openclaw" / "openclaw.json"
@@ -125,7 +124,7 @@ def load_runtime_config(*, require_nim: bool = True) -> RuntimeConfig:
 
     nim_key = os.environ.get("NVIDIA_API_KEY", "").strip()
     if require_nim and not nim_key:
-        raise EnvironmentError(
+        raise OSError(
             "NVIDIA_API_KEY is not set. Export it or add to Codespaces secrets:\n"
             "  export NVIDIA_API_KEY=nvapi-...\n"
             "Get a free key at: https://build.nvidia.com"

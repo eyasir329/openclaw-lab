@@ -29,10 +29,14 @@ keywords    = ["telegram", "bot", "botToken"]
 # Placeholders that look secret-shaped but are intentionally fake.
 
 [allowlist]
-description = "Documented placeholder values"
+description = "Documented placeholder values + test fixtures"
 regexes = [
     '''nvapi-replace-with-real-key''',
     '''nvapi-\.\.\.''',
+    '''nvapi-fake''',
+    '''nvapi-test-stub''',
+    '''nvapi-x''',
+    '''nvapi-1234567890abcdef''',
     '''0000000000:replace-with-real-bot-token''',
     '''<your-bot-token>''',
 ]
@@ -42,4 +46,6 @@ paths = [
     '''docs/.*\.md$''',
     '''README\.md$''',
     '''SECURITY\.md$''',
+    '''tests/.*\.py$''',
+    '''pyproject\.toml$''',
 ]

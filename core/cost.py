@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 # ── Pricing table ─────────────────────────────────────────────────────────────
 # Values are illustrative placeholders. Refresh when NIM publishes real rates.
 
@@ -102,6 +101,6 @@ def accumulate(breakdowns: list[CostBreakdown]) -> CostTotal:
 __all__ = [
     "CostBreakdown",
     "CostTotal",
-    "estimate_cost",
     "accumulate",
+    "estimate_cost",
 ]

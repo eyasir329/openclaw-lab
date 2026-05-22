@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-
 from core.nim_client import NIMResult, strip_fences, try_parse_json
 
 

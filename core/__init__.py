@@ -16,4 +16,4 @@ on first call so test fixtures can swap env vars before anything reads them.
 from __future__ import annotations
 
 __version__ = "1.0.0"
-__all__ = ["config", "nim_client", "ensemble", "auth", "logging", "cost"]
+__all__ = ["auth", "config", "cost", "ensemble", "logging", "nim_client"]

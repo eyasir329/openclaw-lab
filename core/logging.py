@@ -25,6 +25,7 @@ so tests can redirect via the OPENCLAW_AUDIT_LOG env var.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import sys
@@ -34,7 +35,6 @@ from typing import Any
 
 from .config import cached_runtime_config
 
-
 # ── Path resolution ───────────────────────────────────────────────────────────
 
 def _resolve_log_path() -> Path:
@@ -43,7 +43,7 @@ def _resolve_log_path() -> Path:
         return Path(raw).expanduser()
     try:
         return cached_runtime_config().audit_log_path
-    except EnvironmentError:
+    except OSError:
         here = Path(__file__).resolve().parent.parent
         return here / "logs" / "audit.jsonl"
 
@@ -101,10 +101,8 @@ def audit_log(event: str, **fields: Any) -> None:
     except Exception as e:
         # Last-resort: surface to stderr so it's visible in `openclaw status`
         # logs without breaking the calling skill.
-        try:
+        with contextlib.suppress(Exception):
             sys.stderr.write(f"[audit_log] write failed: {type(e).__name__}: {e}\n")
-        except Exception:
-            pass
 
 
 def audit_log_path() -> Path:

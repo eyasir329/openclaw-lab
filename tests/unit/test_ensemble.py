@@ -105,7 +105,7 @@ def test_fusion_sorted_by_agreement_then_score():
     ]
     fused = weighted_average_fusion(outputs, key_fn=lambda o: o["url"])
     # u_high_agree wins despite lower score: 3 models vs 2.
-    # Boost x1.05 applies (3-model consensus): 7.0 × 1.05 = 7.35 → 7.4 (rounded).
+    # Boost x1.05 applies (3-model consensus): 7.0 * 1.05 = 7.35 -> 7.4 (rounded).
     assert fused[0]["url"] == "u_high_agree"
     assert fused[0]["model_agreement"] == 3
     assert fused[1]["url"] == "u_low_agree"
