@@ -1,0 +1,45 @@
+# gitleaks config for OpenClaw Lab
+# See: https://github.com/gitleaks/gitleaks
+#
+# Scans both repo content and history for secret patterns. Run locally:
+#   gitleaks detect --config .gitleaks.toml --redact -v
+# CI runs the same scan on every push via .github/workflows/secret-scan.yml.
+
+title = "OpenClaw Lab gitleaks rules"
+
+# Extend the upstream default ruleset (AWS, GCP, Slack, GitHub, Stripe, ...).
+[extend]
+useDefault = true
+
+# ── Project-specific patterns ─────────────────────────────────────────────────
+
+[[rules]]
+id          = "nvidia-nim-key"
+description = "NVIDIA NIM / Build API key"
+regex       = '''nvapi-[A-Za-z0-9_\-]{20,}'''
+keywords    = ["nvapi"]
+
+[[rules]]
+id          = "telegram-bot-token"
+description = "Telegram bot token"
+regex       = '''[0-9]{8,12}:[A-Za-z0-9_\-]{30,}'''
+keywords    = ["telegram", "bot", "botToken"]
+
+# ── Allow-list ────────────────────────────────────────────────────────────────
+# Placeholders that look secret-shaped but are intentionally fake.
+
+[allowlist]
+description = "Documented placeholder values"
+regexes = [
+    '''nvapi-replace-with-real-key''',
+    '''nvapi-\.\.\.''',
+    '''0000000000:replace-with-real-bot-token''',
+    '''<your-bot-token>''',
+]
+paths = [
+    '''\.env\.example$''',
+    '''\.gitleaks\.toml$''',
+    '''docs/.*\.md$''',
+    '''README\.md$''',
+    '''SECURITY\.md$''',
+]

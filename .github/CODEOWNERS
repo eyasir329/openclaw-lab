@@ -1,0 +1,14 @@
+# CODEOWNERS — automatically request reviewers when these paths change.
+# Format: <path> <@github-handle>
+
+*       @eyasir329
+
+# Security-critical paths get explicit ownership so reviews aren't optional.
+/.github/                                       @eyasir329
+/SECURITY.md                                    @eyasir329
+/.gitignore                                     @eyasir329
+/.gitleaks.toml                                 @eyasir329
+/.claude/settings.json                          @eyasir329
+/core/auth.py                                   @eyasir329
+/core/config.py                                 @eyasir329
+/core/logging.py                                @eyasir329

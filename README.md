@@ -1,8 +1,31 @@
 # OpenClaw Lab
 
-AI agent lab running on GitHub Codespaces. Single `NVIDIA_API_KEY` unlocks 42 verified NVIDIA NIM models through OpenClaw gateway with full Telegram integration — tool use, session memory, skills, and model switching.
+[![CI](https://github.com/eyasir329/openclaw-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/eyasir329/openclaw-lab/actions/workflows/ci.yml)
+[![Secret scan](https://github.com/eyasir329/openclaw-lab/actions/workflows/secret-scan.yml/badge.svg)](https://github.com/eyasir329/openclaw-lab/actions/workflows/secret-scan.yml)
+[![CodeQL](https://github.com/eyasir329/openclaw-lab/actions/workflows/codeql.yml/badge.svg)](https://github.com/eyasir329/openclaw-lab/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
----
+A personal AI lab built around the OpenClaw gateway, NVIDIA NIM (42 verified
+models on a single key), Telegram, and Claude Code. Optimised for **daily
+work**: code review, deep research, web search, and job-search automation —
+all routed through a 6-model parallel ensemble for accuracy where it matters.
+
+> **v1.0 — professional restructure.** A shared `core/` library, 47 unit
+> tests in CI, `gitleaks` + CodeQL scanning, a fail-closed Telegram
+> allowlist, structured audit logging, and explicit Claude Code
+> deny-rules. See [docs/CHANGELOG.md](docs/CHANGELOG.md).
+
+## Documentation
+
+| Reading order | Doc |
+| --- | --- |
+| 1 (start here) | This README — quick tour, setup, gateway, Telegram, models |
+| 2              | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — Codespaces & local setup, ops tasks, troubleshooting |
+| 3              | [docs/SKILLS.md](docs/SKILLS.md) — every skill, when to use it, CLI commands |
+| 4              | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — `core/` library, skill conventions, data flow |
+| 5              | [SECURITY.md](SECURITY.md) — threat model, hardening checklist, vuln reporting |
+| 6              | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — code style, test layout, PR rules |
+| 7              | [docs/CHANGELOG.md](docs/CHANGELOG.md) — release history |
 
 ## Table of Contents
 
@@ -17,6 +40,8 @@ AI agent lab running on GitHub Codespaces. Single `NVIDIA_API_KEY` unlocks 42 ve
 - [Agents](#agents)
 - [Claude Code Integration](#claude-code-integration)
 - [Environment Variables](#environment-variables)
+- [Security](#security)
+- [Development](#development)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -48,30 +73,58 @@ One service. One API key. Everything through OpenClaw.
 ```text
 openclaw-lab/
 ├── .devcontainer/
-│   └── devcontainer.json          # Node 24, Docker-in-Docker, ports 3000/8080/8787
-├── agents/
-│   ├── cavecrew-builder.md        # Subagent: surgical 1-2 file edits
-│   ├── cavecrew-investigator.md   # Subagent: read-only code locator (Haiku)
-│   └── cavecrew-reviewer.md       # Subagent: diff reviewer (Haiku)
-├── data/                          # Persistent data storage
-├── logs/                          # Application logs
+│   └── devcontainer.json          # Node 24, Docker-in-Docker
+├── .github/
+│   ├── workflows/                 # ci, secret-scan, codeql
+│   ├── ISSUE_TEMPLATE/            # bug + feature templates
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── CODEOWNERS
+│   └── dependabot.yml
+├── core/                          # Shared library (NEW in 1.0)
+│   ├── config.py                  #   env + ~/.openclaw/openclaw.json loader
+│   ├── nim_client.py              #   single-call NIM wrapper
+│   ├── ensemble.py                #   6-model fan-out + Kimi-K2.6 fusion
+│   ├── auth.py                    #   Telegram user allowlist (fail-closed)
+│   ├── logging.py                 #   JSONL audit log w/ redaction
+│   └── cost.py                    #   token / USD accounting
+├── agents/                        # Claude Code subagents
+│   ├── cavecrew-builder.md
+│   ├── cavecrew-investigator.md
+│   └── cavecrew-reviewer.md
 ├── skills/
-│   ├── caveman/SKILL.md           # ~75% token reduction communication mode
-│   ├── caveman-commit/SKILL.md    # Conventional Commits generator
-│   ├── caveman-compress/          # Memory file compressor (Python + NIM)
-│   ├── caveman-review/SKILL.md    # Code review comment style
-│   ├── caveman-stats/SKILL.md     # Token usage stats
-│   ├── cavecrew/SKILL.md          # Subagent delegation guide
-│   └── job-search/                # BD CSE job scraper — 6-model NIM ensemble
-│       ├── SKILL.md               #   skill definition + schedule
-│       ├── README.md              #   full documentation
-│       ├── job_search.py          #   executor (~1200 lines)
-│       └── requirements.txt       #   pip dependencies
+│   ├── caveman/                   # ~75% token reduction mode
+│   ├── caveman-commit/            # Conventional Commits generator
+│   ├── caveman-compress/          # Memory file compressor
+│   ├── caveman-review/            # Code review comment style
+│   ├── caveman-stats/             # Token usage stats
+│   ├── cavecrew/                  # Subagent delegation guide
+│   ├── common/tg.py               # Shared Telegram MarkdownV2 helpers
+│   ├── job-search/                # BD CSE job scraper (ensemble)
+│   ├── search/                    # Multi-backend web search (ensemble)
+│   ├── research/                  # Deep-research briefing (ensemble) — NEW
+│   └── review/                    # Ensemble code review — NEW
 ├── src/
 │   ├── hooks/                     # Claude Code event hooks
-│   ├── mcp-servers/caveman-shrink/ # MCP server: text compression via NIM
-│   └── rules/                     # Bootstrap rules injected into Claude sessions
-├── workspace/                     # Working directory for projects
+│   ├── mcp-servers/caveman-shrink/ # MCP server: text compression
+│   └── rules/                     # Session-start rule fragments
+├── tests/
+│   ├── conftest.py                # Shared fixtures, sys.path setup
+│   └── unit/                      # 47 tests covering core/
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── DEPLOYMENT.md
+│   ├── SKILLS.md
+│   ├── CONTRIBUTING.md
+│   └── CHANGELOG.md
+├── data/                          # Persistent SQLite (gitignored content)
+├── logs/                          # Audit + skill logs (gitignored content)
+├── workspace/                     # Scratch dir (gitignored content)
+├── .env.example                   # Documented env var template
+├── .gitleaks.toml                 # Secret-scan rules
+├── .claude/settings.json          # Team-shared Claude Code policy
+├── pyproject.toml                 # Python deps, pytest, ruff, mypy
+├── LICENSE                        # MIT
+├── SECURITY.md
 └── README.md
 ```
 
@@ -379,7 +432,43 @@ openclaw models fallbacks remove nvidia/meta/llama-3.1-70b-instruct
 
 ## Skills
 
+Quick map of every skill is in [docs/SKILLS.md](docs/SKILLS.md). All
+ensemble-backed skills (`job-search`, `search`, `research`, `review`) share
+the same six-model roster via `core.ensemble`.
+
 Invoke via `/skill <name>` in Telegram, or `/<name>` if registered as a slash command.
+
+### `/research` (new in 1.0)
+
+Long-form research briefing. Gathers 20-30 sources from DDG web, DDG news,
+Stack Overflow, GitHub, and Semantic Scholar (intent-driven), then fans
+out to the 6-model ensemble and fuses with Kimi-K2.6 at temperature=0.
+Output: summary, key findings, conflicting claims, best sources, follow-up
+queries, limitations.
+
+```bash
+python skills/research/research.py "what's the state of speculative decoding in late 2025"
+python skills/research/research.py "X vs Y" --academic
+python skills/research/research.py "..." --json
+```
+
+Full docs: [`skills/research/SKILL.md`](skills/research/SKILL.md)
+
+### `/review` (new in 1.0)
+
+Ensemble code review for the current diff, a branch, a file, or a GitHub PR.
+Returns `path:line: <emoji> <severity>: <problem>. fix: <suggestion>.` Sorted
+by severity (bug → risk → nit → question), then confidence, then file:line.
+
+```bash
+python skills/review/review.py             # diff vs HEAD
+python skills/review/review.py main        # diff vs main branch
+python skills/review/review.py src/auth.py # whole-file review
+python skills/review/review.py --pr        # current branch's PR
+```
+
+Full docs: [`skills/review/SKILL.md`](skills/review/SKILL.md)
+
 
 ### `/job-search`
 
@@ -560,16 +649,53 @@ Markdown files injected into Claude Code system context on session start:
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NVIDIA_API_KEY` | Yes | NVIDIA NIM API key. Shared by all models. |
-| `CAVEMAN_MODEL` | No | Override model for `/caveman-compress`. Default: `nvidia/nemotron-3-super-120b-a12b` |
+The canonical list lives in [`.env.example`](.env.example). Hot vars:
 
-Set as Codespaces secret (never commit to repo). Or export in terminal:
+| Variable                | Required | Description                                                         |
+|-------------------------|----------|---------------------------------------------------------------------|
+| `NVIDIA_API_KEY`        | yes      | NVIDIA NIM API key. Shared by all 42 models.                         |
+| `TELEGRAM_BOT_TOKEN`    | when bot is exposed | Bot token from @BotFather.                              |
+| `TELEGRAM_CHAT_ID`      | when bot is exposed | Numeric id the bot sends to.                           |
+| `ALLOWED_TG_USER_IDS`   | **yes when bot is exposed** | Comma-separated allowlist. Empty = bot rejects everyone (fail-closed). |
+| `CAVEMAN_MODEL`         | no       | Override model for `/caveman-compress`.                              |
+| `CAVEMAN_DEFAULT_MODE`  | no       | `off | lite | full | ultra | wenyan-*`. Default: `full`.            |
+| `OPENCLAW_AUDIT_LOG`    | no       | Override audit log path. Default: `<repo>/logs/audit.jsonl`.         |
+
+Set as Codespaces secrets (never commit to repo) or via a local `.env`:
 
 ```bash
-export NVIDIA_API_KEY="nvapi-..."
+cp .env.example .env  # then edit and `source .env`
 ```
+
+## Security
+
+OpenClaw Lab runs an LLM with shell access on the operator's machine and
+optionally exposes a Telegram entry point. Treat it as security-critical.
+
+- **Fail-closed Telegram allowlist** (`core.auth`). Empty allowlist rejects every user.
+- **`gitleaks` CI on every push + weekly cron** — see `.gitleaks.toml`.
+- **CodeQL** static analysis for Python + JavaScript.
+- **Claude Code policy** in `.claude/settings.json` with explicit `deny` rules for
+  `rm -rf /*`, `git push --force`, secret-printing patterns, and reading
+  `~/.openclaw/agents/main/agent/auth-profiles.json`.
+- **Audit log** at `logs/audit.jsonl` (JSONL, append-only) with key-name redaction.
+- **`.env.example`** documents every variable; nothing else is read from disk.
+
+Threat model and reporting: [SECURITY.md](SECURITY.md).
+
+## Development
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+pytest -q                                          # 47 unit tests
+ruff check core tests skills/review skills/research
+gitleaks detect --config .gitleaks.toml --redact -v
+```
+
+CI runs the same three commands on every push. See
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for code style, test layout,
+and PR rules.
 
 ---
 

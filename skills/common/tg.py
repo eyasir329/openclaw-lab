@@ -2,54 +2,42 @@
 OpenClaw shared Telegram MarkdownV2 utilities.
 
 Usage in any skill:
-    import sys; sys.path.insert(0, str(Path(__file__).parent.parent))
-    from common.tg import tg_escape, send_telegram, conf_bar, Card
+    import sys; sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from skills.common.tg import tg_escape, send_telegram, conf_bar, Card
+
+Configuration loading delegates to `core.config` (added in the v1.0 pro
+restructure). The legacy `load_config()` 3-tuple signature is preserved so
+existing skills keep working unchanged.
 """
 
 from __future__ import annotations
 
 import asyncio
-import json
-import os
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 import aiohttp
 
-# ── Config path ────────────────────────────────────────────────────────────────
-OPENCLAW_CONFIG = Path.home() / ".openclaw/openclaw.json"
+# ── Make repo root importable so `from core.config import …` works ────────────
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from core.config import load_config as _core_load_config  # noqa: E402
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CONFIG LOADER
+# CONFIG LOADER (back-compat shim — delegates to core.config)
 # ══════════════════════════════════════════════════════════════════════════════
 
 def load_config() -> tuple[str, str, str]:
     """
-    Returns (bot_token, chat_id, nim_key).
-    chat_id: channels.telegram.chatId > TELEGRAM_CHAT_ID env > ownerAllowFrom.
-    nim_key: NVIDIA_API_KEY env only — never stored in config.
+    Returns (bot_token, chat_id, nim_key). Thin shim over `core.config.load_config()`.
+    Kept for back-compat with existing skill scripts.
     """
-    with open(OPENCLAW_CONFIG) as f:
-        cfg = json.load(f)
-
-    token   = cfg["channels"]["telegram"]["botToken"]
-    chat_id = cfg["channels"]["telegram"].get("chatId") or os.environ.get("TELEGRAM_CHAT_ID")
-    if not chat_id:
-        for entry in cfg.get("commands", {}).get("ownerAllowFrom", []):
-            if entry.startswith("telegram:"):
-                chat_id = entry.split(":", 1)[1]
-                break
-
-    nim_key = os.environ.get("NVIDIA_API_KEY", "")
-    if not nim_key:
-        raise EnvironmentError(
-            "NVIDIA_API_KEY environment variable is not set. "
-            "Export it: export NVIDIA_API_KEY=nvapi-..."
-        )
-
-    return token, str(chat_id), nim_key
+    return _core_load_config()
 
 
 # ══════════════════════════════════════════════════════════════════════════════

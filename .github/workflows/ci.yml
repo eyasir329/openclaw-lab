@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: python · tests + lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dev deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check core tests skills/review skills/research
+
+      - name: Pytest
+        env:
+          # CI must not see real keys. Tests stub their own via monkeypatch.
+          NVIDIA_API_KEY: ""
+        run: pytest -q
+
+      - name: Coverage (informational)
+        continue-on-error: true
+        run: pytest --cov=core --cov-report=term-missing tests/
+
+  node:
+    name: node · hook syntax check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Lint Claude Code hooks
+        run: |
+          for f in src/hooks/*.js src/mcp-servers/caveman-shrink/*.js; do
+            node --check "$f"
+            echo "OK $f"
+          done

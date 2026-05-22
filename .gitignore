@@ -1,2 +1,119 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# OpenClaw Lab — .gitignore
+# Keep secrets, runtime state, and large artifacts out of the public repo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+auth-profiles.json
 openclaw_help.txt
+
+# ── OpenClaw runtime ──────────────────────────────────────────────────────────
+.openclaw/
+~/.openclaw/
+
+# ── Skill runtime data ────────────────────────────────────────────────────────
+data/*.db
+data/*.db-*
+data/*.sqlite
+data/*.sqlite-*
+logs/*.log
+logs/*.jsonl
+workspace/*
+!workspace/.gitkeep
+!data/.gitkeep
+!logs/.gitkeep
+
+# ── Caveman backups ───────────────────────────────────────────────────────────
+*.original.md
+*.original.txt
+.caveman-active
+.caveman-history.jsonl
+.caveman-statusline-suffix
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# mypy / ruff
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# virtualenvs
+.venv/
+venv/
+env/
+ENV/
+
+# ── Node ──────────────────────────────────────────────────────────────────────
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.pnpm-store/
+package-lock.json
+yarn.lock
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Claude Code local overrides ───────────────────────────────────────────────
+.claude/settings.local.json
+.claude/.history*
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.orig
+.cache/
